@@ -38,6 +38,7 @@ Parameters:
     -sk (-signkey) <key-name> - Name of xvd sign key to use
     -odk (-odkid) <id> - Id of Offline Distribution key to use (uint)
     -cik (-cikguid) <GUID> - Guid of Content Instance key to use
+    -dk (-devicekey) <hex-encoded-key> - Device key to use for decrypting UWP Content Instance keys
 
     -nd (-nodatahash) - disable data hash checking, speeds up -l and -f
     -ne (-noextract) - disable data (embedded XVD/user data) extraction, speeds up -l and -f

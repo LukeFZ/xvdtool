@@ -97,6 +97,19 @@ namespace XVDTool
                     if (!Guid.TryParse(v, out cikToUse))
                         throw new OptionException("Invalid CIK GUID", "cikguid");
                 }},
+                { "dk|devicekey=", v =>
+                {
+                    if (v.Length != 32)
+                        throw new OptionException("Supplied device key is too short", "devicekey");
+                    try
+                    {
+                        UwpCikDerivation.DeviceKey = Convert.FromHexString(v);
+                    }
+                    catch
+                    {
+                        throw new OptionException("Invalid Device Key", "devicekey");
+                    }
+                }},
                 { "nd|nodatahash", v => XvdFile.DisableDataHashChecking = v != null },
                 { "ne|noextract", v => disableDataExtract = v != null },
 
@@ -157,6 +170,7 @@ namespace XVDTool
                 Console.WriteLine(fmt + "-sk (-signkey) <key-name> - Name of xvd sign key to use");
                 Console.WriteLine(fmt + "-odk (-odkid) <id> - Id of Offline Distribution key to use (uint)");
                 Console.WriteLine(fmt + "-cik (-cikguid) <GUID> - Guid of Content Instance key to use");
+                Console.WriteLine(fmt + "-dk (-devicekey) <hex-encoded-key> - Device key to use for decrypting UWP Content Instance keys");
                 Console.WriteLine();
                 Console.WriteLine(fmt + "-nd (-nodatahash) - disable data hash checking, speeds up -l and -f");
                 Console.WriteLine(fmt + "-ne (-noextract) - disable data (embedded XVD/user data) extraction, speeds up -l and -f");

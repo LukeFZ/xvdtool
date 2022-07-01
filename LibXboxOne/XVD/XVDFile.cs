@@ -1067,6 +1067,56 @@ namespace LibXboxOne
                 xml.Load(file);
 
                 var xmlns = new XmlNamespaceManager(xml.NameTable);
+                xmlns.AddNamespace("x", "urn:schemas-microsoft-com:windows:store:licensing:ls");
+
+                XmlNode uwpLicense = xml.SelectSingleNode("/x:License/x:SPLicenseBlock", xmlns);
+
+                if (uwpLicense != null && UwpCikDerivation.DeviceKeyLoaded) // Is UWP License
+                {
+                    string uwpLicenseBlock = uwpLicense.InnerText;
+                    byte[] uwpLicenseBlockBytes = Convert.FromBase64String(uwpLicenseBlock);
+
+                    XvcLicenseBlock uwpBlock = new XvcLicenseBlock(uwpLicenseBlockBytes);
+
+                    try
+                    {
+                        XvcLicenseBlock packedContentKeyBlock =
+                            uwpBlock.GetBlockWithId(XvcLicenseBlockId.PackedContentKeys);
+
+                        if (packedContentKeyBlock == null)
+                            continue;
+
+                        Console.WriteLine("Found valid XML License.");
+
+                        using (var contentKeyStream =
+                               new BinaryReader(new MemoryStream(packedContentKeyBlock.BlockData)))
+                        {
+                            while (contentKeyStream.BaseStream.Position != contentKeyStream.BaseStream.Length)
+                            {
+                                short keyIdSize = contentKeyStream.ReadInt16(); // 0x20 - 2 GUIDs
+                                short packedKeySize = contentKeyStream.ReadInt16(); // 0x28 - AES Key-Wrapped Block
+
+                                Guid firstKeyId = new Guid(contentKeyStream.ReadBytes(16));
+                                Guid secondKeyId = new Guid(contentKeyStream.ReadBytes(16));
+
+                                byte[] packedKey = contentKeyStream.ReadBytes(packedKeySize);
+
+                                if (keyGuid == firstKeyId)
+                                {
+                                    keyOutput = UwpCikDerivation.DecryptPackedKey(packedKey);
+                                    Console.WriteLine("Successfully derived CIK!");
+
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    catch // Either we parsed a lease license, so no PackedContentKey block, or there was an error during key unwrapping.
+                    {
+                        continue;
+                    }
+                }
+
                 xmlns.AddNamespace("resp", "http://schemas.microsoft.com/xboxlive/security/clas/LicResp/v1");
 
                 XmlNode licenseNode = xml.SelectSingleNode("//resp:SignedLicense", xmlns);

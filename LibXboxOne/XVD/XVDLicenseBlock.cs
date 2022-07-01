@@ -30,6 +30,32 @@ namespace LibXboxOne
         Unknown6 = 0x2C,
         PossibleHash = 0x2A,
         PossibleSignature = 0x2B, // length 0x100, could be the encrypted CIK if it's encrypted in the same way as EKB files
+
+        // UWP SPLicenseBlock block IDs follow
+
+        UwpUnknown0 = 0x0,
+        EncryptedDeviceKey = 0x1,
+        DeviceLicenseDeviceId = 0x2,
+        LicenseExpirationTime = 0x20,
+        LicenseInformation = 0xC9,
+        PackedContentKeys = 0xCA,
+        LicenseId = 0xCB,
+        SignatureBlock = 0xCC,
+        LicenseEntryIds = 0xCD,
+        PackageFullName = 0xCE,
+        UwpUnknown1 = 0xCF,
+        HardwareId = 0xD0,
+        UwpUnknown2 = 0xD1,
+        LicenseDeviceId = 0xD2,
+        PollingTime = 0xD3,
+        LicensePolicies = 0xD4,
+        UwpUnknown3 = 0xD5,
+        KeyholderPublicSigningKey = 0xDC,
+        KeyholderPolicies = 0xDD,
+        KeyholderKeyLicenseId = 0xDE,
+        ClepSignState = 0x12D,
+        UwpUnknown4 = 0x12E,
+
     }
 
     // XvcLicenseBlock can load in SPLicenseBlock data and EKB data

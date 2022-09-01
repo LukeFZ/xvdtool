@@ -1232,7 +1232,6 @@ namespace LibXboxOne
                 if (xvcKeyFound)
                 {
                     b.AppendLine($"Decrypt key for xvc keyslot 0: {decryptKey.ToHexString()}");
-                    b.AppendLine("(key is wrong though until the obfuscation/encryption on it is figured out)");
                     b.AppendLine();
                 }
 

@@ -1158,9 +1158,29 @@ namespace LibXboxOne
                 if (decryptKeyBlock == null)
                     continue;
 
-                keyOutput = decryptKeyBlock.BlockData;
                 Console.WriteLine($"Xvd CIK key found in {file}");
-                // todo: decrypt/deobfuscate the key
+
+                var odkToUse = OverrideOdk == OdkIndex.Invalid ? Header.ODKKeyslotID : OverrideOdk;
+
+                var odkKey = DurangoKeys.GetOdkById(odkToUse);
+                if (!(odkKey is {HasKeyData: true}))
+                    throw new InvalidOperationException(
+                        $"ODK with Id \'{odkToUse}\' not found! Cannot decrypt license CIK.");
+
+                if (odkKey.KeyData.Length != 32)
+                    throw new InvalidOperationException(
+                        $"ODK with Id \'{odkToUse}\' has invalid KeyData (Length != 32). Cannot decrypt license CIK.");
+
+                var cipher = Aes.Create();
+                cipher.Mode = CipherMode.ECB;
+                cipher.Padding = PaddingMode.None;
+
+                keyOutput = new byte[32];
+                var transform = cipher.CreateDecryptor(odkKey.KeyData, new byte[16]);
+
+                transform.TransformBlock(decryptKeyBlock.BlockData, 0, decryptKeyBlock.BlockData.Length, keyOutput, 0);
+
+                Console.WriteLine($"Decrypted license CIK key with ODK {odkToUse}");
 
                 return true;
             }

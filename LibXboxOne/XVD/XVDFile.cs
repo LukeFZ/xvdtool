@@ -1164,12 +1164,16 @@ namespace LibXboxOne
 
                 var odkKey = DurangoKeys.GetOdkById(odkToUse);
                 if (!(odkKey is {HasKeyData: true}))
-                    throw new InvalidOperationException(
-                        $"ODK with Id \'{odkToUse}\' not found! Cannot decrypt license CIK.");
+                {
+                    Console.WriteLine($"ODK with Id \'{odkToUse}\' not found! Cannot decrypt license CIK.");
+                    continue;
+                }
 
                 if (odkKey.KeyData.Length != 32)
-                    throw new InvalidOperationException(
-                        $"ODK with Id \'{odkToUse}\' has invalid KeyData (Length != 32). Cannot decrypt license CIK.");
+                {
+                    Console.WriteLine($"ODK with Id \'{odkToUse}\' has invalid KeyData (Length != 32). Cannot decrypt license CIK.");
+                    continue;
+                }
 
                 var cipher = Aes.Create();
                 cipher.Mode = CipherMode.ECB;
